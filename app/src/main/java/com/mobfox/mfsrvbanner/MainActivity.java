@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     {
         String txt = "Queue has "+mArrMobFoxAdResponses.size()+" ads";
         ((TextView)findViewById(R.id.lblQueueStatus)).setText(txt);
+
+        ((Button)findViewById(R.id.btnGO)).setEnabled(mArrMobFoxAdResponses.size()>0);
     }
 
     private void UpdateBannerStatus(String txt)
