@@ -7,7 +7,8 @@ MobFox Banner with service
 * [Installation](#installation)
 * [Usage](#usage)
 * [Manifest](#manifest)
-* [Code](#code)
+* [Background Service](#background-service)
+* [Foreground Code](#foreground-code-service)
 
 <!-- toc stop -->
 
@@ -83,10 +84,17 @@ dependencies {
 Where **MFBannerService** is the name of the service your app will use to get the banner
 request from MobFox.
 
-### Code
 
-You can copy the **MFBannerService.java** file and use it as a whole to your banner retrieval
-service.
+
+### JobService
+
+This SDK varies from the standard Banner SDK by the fact that it allows your app to get
+Banner/s in the background using a JobService, so that you always have a banner ad ready
+for display when needed.
+
+To do that you need to add to your app a JobService to handle the background work.
+
+You can copy the **MFBannerService.java** file and use it as your banner retrieval service:
 
 ```java
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -140,6 +148,192 @@ public class MFBannerService extends JobService{
     }
 }
 ```
+
+
+
+### Background Service
+
+This SDK varies from the standard Banner SDK by the fact that it allows your app to get
+Banner/s in the background using a JobService, so that you always have a banner ad ready
+for display when needed.
+
+To do that you need to add to your app a JobService to handle the background work.
+
+You can copy the **MFBannerService.java** file and use it as your banner retrieval service:
+
+```java
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+public class MFBannerService extends JobService{
+
+public static final String AD_LOADED      = "onAdLoaded";
+public static final String AD_FAILED_LOAD = "onAdFailLoad";
+
+@Override
+public boolean onStartJob(final JobParameters params) {
+
+// read the inventory hash and user-agent from app:
+String invh = params.getExtras().getString("invh");
+String ua   = params.getExtras().getString("ua");
+
+// create ad request:
+MobFoxAdRequest mfAdRequest = MobFoxAdRequest.getInstance();
+
+// request the ad:
+mfAdRequest.requestBanner(this, ua, invh,
+320, 50, new MobFoxAdRequest.Listener() {
+
+@Override
+public void onAdLoaded(JSONObject adResponse) {
+
+// if got response - broadcast to app:
+Intent loadedIntent = new Intent(AD_LOADED);
+loadedIntent.putExtra("ad", adResponse.toString());
+sendBroadcast(loadedIntent);
+
+jobFinished(params,true);
+}
+
+@Override
+public void onAdFailLoad(String err) {
+
+// if failed - broadcast error to app:
+Intent failedIntent = new Intent(AD_FAILED_LOAD);
+failedIntent.putExtra("error", err);
+sendBroadcast(failedIntent);
+
+jobFinished(params,true);
+}
+});
+return true;
+}
+
+@Override
+public boolean onStopJob(JobParameters params) {
+return false;
+}
+}
+```
+
+
+### Foreground Code
+
+On your foreground code you need to initialize and start the service, get the ad data
+retrived by it, and then use it at will to display the banner/s. 
+
+You can use the **MainActivity.java** file as a reference for this.
+
+1. Initialize and start the background service:
+
+```java
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+private void startMobFoxBannerService()
+{
+    // define broadcast receiver (handle broadcasts from service):
+    BroadcastReceiver receiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if ((intent!=null) && (intent.getAction()!=null))
+            {
+                // handle error in service: 
+                if (intent.getAction().equals(MFBannerService.AD_FAILED_LOAD)) {
+                    String error = intent.getStringExtra("error");
+                    if (error!=null)
+                    {
+                        // here you can display or otherwise handle the error:
+                        // ...
+                    }
+                }
+                // handle ad data retrived from service:
+                if (intent.getAction().equals(MFBannerService.AD_LOADED)) {
+                    String adResponse = intent.getStringExtra("ad");
+                    if (adResponse!=null)
+                    {
+                        // here you can handle the ad data retrieved:
+                        // in the demo app we save it to a queue of banner ad data
+                        mArrMobFoxAdResponses.add(adResponse);
+                        // ...
+                    }
+                }
+            }
+        }
+    };
+
+    // register receivers for broadcasts from service:
+    IntentFilter intentFilter;
+    intentFilter = new IntentFilter(MFBannerService.AD_FAILED_LOAD);
+    this.registerReceiver(receiver, intentFilter);
+    intentFilter = new IntentFilter(MFBannerService.AD_LOADED);
+    this.registerReceiver(receiver, intentFilter);
+
+    // start the service:
+    jobScheduler = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
+
+    ComponentName jobService = new ComponentName(getPackageName(), MFBannerService.class.getName());
+
+    PersistableBundle bundle = new PersistableBundle();
+    bundle.putString("invh","fe96717d9875b9da4339ea5367eff1ec");
+    bundle.putString("ua"  , MobFoxReport.getUserAgent(MainActivity.this));
+
+    JobInfo jobInfo = new JobInfo.Builder(JOB_ID, jobService)
+                            .setMinimumLatency(1000)
+                            .setOverrideDeadline(5000)
+                            .setExtras(bundle).build();
+
+    jobScheduler.schedule(jobInfo);
+}
+```
+
+
+2. Use the retrieved banner ad data to display a banner (example from demo app): 
+
+```java
+private void HandleMobFoxBanner(String adResponse)
+{
+    BannerWithExternalResponse banner  = new BannerWithExternalResponse(adResponse,
+                                            MainActivity.this,
+                                            320,
+                                            50,
+                                            "fe96717d9875b9da4339ea5367eff1ec", 
+                                            new Banner.Listener()
+    {
+        @Override
+        public void onBannerError(Banner banner, Exception e) {
+            UpdateBannerStatus("Banner error: "+e.getLocalizedMessage());
+        }
+
+        @Override
+        public void onBannerLoaded(Banner banner) {
+            UpdateBannerStatus("onBannerLoaded");
+        }
+
+        @Override
+        public void onBannerClosed(Banner banner) {
+            UpdateBannerStatus("onBannerClosed");
+        }
+
+        @Override
+        public void onBannerFinished() {
+            UpdateBannerStatus("onBannerFinished");
+        }
+
+        @Override
+        public void onBannerClicked(Banner banner) {
+            UpdateBannerStatus("onBannerClicked");
+        }
+
+        @Override
+        public void onNoFill(Banner banner) {
+            UpdateBannerStatus("onNoFill");
+        }
+    });
+
+    RelativeLayout view = findViewById(R.id.bannerContainer);
+    view.addView(banner);
+    banner.load();
+}
+```
+
 
 
 # Thank you for using MobFox-Service-Banner-SDK !
