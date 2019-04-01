@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -31,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     JobScheduler jobScheduler;
     public final static int JOB_ID = 111;
 
-    private ArrayList<String> mArrMobFoxAdResponses = new ArrayList<String>();
+    private ArrayList<String> mArrMobFoxAdResponses = new ArrayList<>();
 
     //====================================================================
 
@@ -87,37 +86,31 @@ public class MainActivity extends AppCompatActivity {
         {
             @Override
             public void onBannerError(Banner banner, Exception e) {
-                Log.i("Calldorado","dbg: ### onBannerError: "+e.getLocalizedMessage());
                 UpdateBannerStatus("Banner error: "+e.getLocalizedMessage());
             }
 
             @Override
             public void onBannerLoaded(Banner banner) {
-                Log.i("Calldorado","dbg: ### onBannerLoaded: ###");
                 UpdateBannerStatus("onBannerLoaded");
             }
 
             @Override
             public void onBannerClosed(Banner banner) {
-                Log.i("Calldorado","dbg: ### onBannerClosed: ###");
                 UpdateBannerStatus("onBannerClosed");
             }
 
             @Override
             public void onBannerFinished() {
-                Log.i("Calldorado","dbg: ### onBannerFinished: ###");
                 UpdateBannerStatus("onBannerFinished");
             }
 
             @Override
             public void onBannerClicked(Banner banner) {
-                Log.i("Calldorado","dbg: ### onBannerClicked: ###");
                 UpdateBannerStatus("onBannerClicked");
             }
 
             @Override
             public void onNoFill(Banner banner) {
-                Log.i("Calldorado","dbg: ### onNoFill: ###");
                 UpdateBannerStatus("onNoFill");
             }
         });
@@ -138,19 +131,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                if (intent.getAction().equals(MFBannerService.AD_FAILED_LOAD)) {
-                    String error = intent.getStringExtra("error");
-                    Log.i("Calldorado","dbg: ### AD_FAILED_LOAD: "+error);
-                }
+                if ((intent!=null) && (intent.getAction()!=null))
+                {
+                    if (intent.getAction().equals(MFBannerService.AD_FAILED_LOAD)) {
 
-                if (intent.getAction().equals(MFBannerService.AD_LOADED)) {
-                    Log.i("Calldorado","dbg: ### AD_LOADED ###");
+                        String error = intent.getStringExtra("error");
+                        if (error!=null)
+                        {
+                            UpdateBannerStatus(error);
+                        }
+                    }
 
-                    String adResponse = intent.getStringExtra("ad");
-                    if (adResponse!=null)
-                    {
-                        mArrMobFoxAdResponses.add(adResponse);
-                        UpdateQueueStatus();
+                    if (intent.getAction().equals(MFBannerService.AD_LOADED)) {
+
+                        String adResponse = intent.getStringExtra("ad");
+                        if (adResponse!=null)
+                        {
+                            mArrMobFoxAdResponses.add(adResponse);
+                            UpdateQueueStatus();
+                        }
                     }
                 }
             }
@@ -164,8 +163,6 @@ public class MainActivity extends AppCompatActivity {
         this.registerReceiver(receiver, intentFilter);
 
         // start the service:
-        Log.i("Calldorado","dbg: ### STARTING... ###");
-
         jobScheduler = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
 
         ComponentName jobService = new ComponentName(getPackageName(), MFBannerService.class.getName());
@@ -179,6 +176,6 @@ public class MainActivity extends AppCompatActivity {
                 .setOverrideDeadline(5000)
                 .setExtras(bundle).build();
 
-        int jobId = jobScheduler.schedule(jobInfo);
+        jobScheduler.schedule(jobInfo);
     }
 }
