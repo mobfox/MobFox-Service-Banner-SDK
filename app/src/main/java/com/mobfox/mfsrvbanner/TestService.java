@@ -6,7 +6,6 @@ import android.app.job.JobService;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
-import android.util.Log;
 
 import com.github.mobfox.from_service.MobFoxAdRequest;
 
@@ -21,25 +20,22 @@ public class TestService extends JobService{
 
     @Override
     public boolean onStartJob(final JobParameters params) {
-        /*
-         * True - if your service needs to process
-         * the work (on a separate thread).
-         * False - if there's no more work to be done for this job.
-         */
 
-        Log.i("Calldorado","dbg: ### service-onStartJob ###");
-
+        // read the inventory hash and user-agent from app:
         String invh = params.getExtras().getString("invh");
         String ua   = params.getExtras().getString("ua");
 
-        MobFoxAdRequest mfadr = MobFoxAdRequest.getInstance();
-        mfadr.requestBanner(this, ua, invh,
+        // create ad request:
+        MobFoxAdRequest mfAdRequest = MobFoxAdRequest.getInstance();
+
+        // request the ad:
+        mfAdRequest.requestBanner(this, ua, invh,
                 320, 50, new MobFoxAdRequest.Listener() {
+
                     @Override
                     public void onAdLoaded(JSONObject adResponse) {
 
-                        Log.i("Calldorado","dbg: ### service-onAdLoaded ###");
-
+                        // if got response - broadcast to app:
                         Intent loadedIntent = new Intent(AD_LOADED);
                         loadedIntent.putExtra("ad", adResponse.toString());
                         sendBroadcast(loadedIntent);
@@ -50,8 +46,7 @@ public class TestService extends JobService{
                     @Override
                     public void onAdFailLoad(String err) {
 
-                        Log.i("Calldorado","dbg: ### service-onAdFailLoad: "+err);
-
+                        // if failed - broadcast error to app:
                         Intent failedIntent = new Intent(AD_FAILED_LOAD);
                         failedIntent.putExtra("error", err);
                         sendBroadcast(failedIntent);
@@ -64,9 +59,6 @@ public class TestService extends JobService{
 
     @Override
     public boolean onStopJob(JobParameters params) {
-
-        Log.i("Calldorado","dbg: ### service-onStopJob ###");
-
         return false;
     }
 }
