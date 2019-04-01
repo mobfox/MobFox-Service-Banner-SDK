@@ -7,7 +7,7 @@ MobFox Banner with service
 * [Installation](#installation)
 * [Usage](#usage)
 * [Manifest](#manifest)
-* [Initializing the SDK](#initializing)
+* [Code](#code)
 
 <!-- toc stop -->
 
@@ -83,6 +83,8 @@ dependencies {
 Where **MFBannerService** is the name of the service your app will use to get the banner
 request from MobFox.
 
+### Code
+
 You can copy the **MFBannerService.java** file and use it as a whole to your banner retrieval
 service.
 
@@ -138,10 +140,6 @@ public class MFBannerService extends JobService{
     }
 }
 ```
-
-
-## Initializing
-
 
 
 # Thank you for using MobFox-Service-Banner-SDK !
