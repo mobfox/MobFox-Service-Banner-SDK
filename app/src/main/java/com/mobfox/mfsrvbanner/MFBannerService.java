@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class TestService extends JobService{
+public class MFBannerService extends JobService{
 
     public static final String AD_LOADED      = "onAdLoaded";
     public static final String AD_FAILED_LOAD = "onAdFailLoad";

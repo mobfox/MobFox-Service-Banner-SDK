@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".TestService"
+        <service android:name=".MFBannerService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             />
 

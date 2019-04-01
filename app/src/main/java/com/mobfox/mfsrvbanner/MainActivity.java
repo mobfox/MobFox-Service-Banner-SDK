@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -139,12 +138,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                if (intent.getAction().equals(TestService.AD_FAILED_LOAD)) {
+                if (intent.getAction().equals(MFBannerService.AD_FAILED_LOAD)) {
                     String error = intent.getStringExtra("error");
                     Log.i("Calldorado","dbg: ### AD_FAILED_LOAD: "+error);
                 }
 
-                if (intent.getAction().equals(TestService.AD_LOADED)) {
+                if (intent.getAction().equals(MFBannerService.AD_LOADED)) {
                     Log.i("Calldorado","dbg: ### AD_LOADED ###");
 
                     String adResponse = intent.getStringExtra("ad");
@@ -159,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
         // register receiver:
         IntentFilter intentFilter;
-        intentFilter = new IntentFilter(TestService.AD_FAILED_LOAD);
+        intentFilter = new IntentFilter(MFBannerService.AD_FAILED_LOAD);
         this.registerReceiver(receiver, intentFilter);
-        intentFilter = new IntentFilter(TestService.AD_LOADED);
+        intentFilter = new IntentFilter(MFBannerService.AD_LOADED);
         this.registerReceiver(receiver, intentFilter);
 
         // start the service:
@@ -169,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
 
         jobScheduler = (JobScheduler)getSystemService(JOB_SCHEDULER_SERVICE);
 
-        ComponentName jobService = new ComponentName(getPackageName(), TestService.class.getName());
+        ComponentName jobService = new ComponentName(getPackageName(), MFBannerService.class.getName());
 
         PersistableBundle bundle = new PersistableBundle();
         bundle.putString("invh","fe96717d9875b9da4339ea5367eff1ec");
