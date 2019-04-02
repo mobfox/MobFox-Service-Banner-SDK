@@ -34,7 +34,7 @@ To add it to your project, please follow the steps below:
 1. Make sure you have a **/app/libs** folder inside your project, and copy the AAR
 or JAR file to it.
 
-2. Add this **gradle.build** file to your main (root or project):
+2. Add the following **gradle.build** file to your main (root or project):
 
 ```java
 allprojects {
