@@ -19,22 +19,22 @@ MobFox Banner with service
 
 # Installation
 
-Clone or download **MobFox-Service-Banner-SDK** from here, and extract it on your computer.
-In it you will find a demo application for how the **MobFox-Service-Banner-SDK** can be used.
+Clone or download **MobFox-Service-Banner-SDK** from this repository, and extract it on your computer.
+The folder includes a demo application that uses **MobFox-Service-Banner-SDK** and demonstrates how it can be used.
 
 You can import this project to Android Studio, and use it as a reference
-or base to make your alterations.
+or as abase to make your alterations.
 
 If you already have an existing project, or want to create a new one,
 The **MobFox-Service-Banner-SDK** comes in the form of **MobFox-Android-Service-Banner-X.X.X.aar**. 
-You should be able to locate it in the **/app/libs** folder. There is also a **JAR** file there if you prefare.
+You should be able to locate it in the **/app/libs** folder. There is also a **JAR** file there if you prefar to use this format.
 
-To add it to your project, follow the steps below:
+To add it to your project, please follow the steps below:
 
-1. make sure you have a **/app/libs** folder inside your project, and copy the AAR
+1. Make sure you have a **/app/libs** folder inside your project, and copy the AAR
 or JAR file to it.
 
-2. In your main (root or project) **gradle.build** file add this:
+2. Add this **gradle.build** file to your main (root or project):
 
 ```java
 allprojects {
@@ -48,7 +48,7 @@ allprojects {
 }
 ```
 
-3. In your application **gradle.build** file add this:
+3. Add the following **gradle.build** file to your application:
 
 ```java
 dependencies {
