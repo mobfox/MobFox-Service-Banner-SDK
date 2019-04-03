@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.github.mobfox.from_service.MobFoxAdRequest;
+import com.mobfox.sdk.service_banner.MobFoxAdRequest;
 
 import org.json.JSONObject;
 

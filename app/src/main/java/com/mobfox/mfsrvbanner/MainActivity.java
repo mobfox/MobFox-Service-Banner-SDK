@@ -19,9 +19,9 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.github.mobfox.from_service.BannerWithExternalResponse;
 import com.mobfox.sdk.banner.Banner;
 import com.mobfox.sdk.logging.MobFoxReport;
+import com.mobfox.sdk.service_banner.BannerWithExternalResponse;
 
 import java.util.ArrayList;
 
@@ -87,33 +87,28 @@ public class MainActivity extends AppCompatActivity {
                 "fe96717d9875b9da4339ea5367eff1ec", new Banner.Listener()
         {
             @Override
-            public void onBannerError(Banner banner, Exception e) {
-                UpdateBannerStatus("Banner error: "+e.getLocalizedMessage());
+            public void onBannerLoadFailed(Banner banner, String s) {
+
             }
 
             @Override
             public void onBannerLoaded(Banner banner) {
-                UpdateBannerStatus("onBannerLoaded");
+
             }
 
             @Override
             public void onBannerClosed(Banner banner) {
-                UpdateBannerStatus("onBannerClosed");
+
             }
 
             @Override
             public void onBannerFinished() {
-                UpdateBannerStatus("onBannerFinished");
+
             }
 
             @Override
             public void onBannerClicked(Banner banner) {
-                UpdateBannerStatus("onBannerClicked");
-            }
 
-            @Override
-            public void onNoFill(Banner banner) {
-                UpdateBannerStatus("onNoFill");
             }
         });
 
